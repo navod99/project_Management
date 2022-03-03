@@ -1,11 +1,12 @@
 import './App.css';
 import { ChakraProvider } from '@chakra-ui/react'
+import Routing from './Components/Routing';
 
 function App() {
   return (
-    <div className="App">
-      
-    </div>
+    <ChakraProvider >      
+      <Routing/>
+    </ChakraProvider>
   );
 }
 
