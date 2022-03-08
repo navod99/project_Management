@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Flex,
   Heading,
@@ -15,11 +15,39 @@ import {
 } from "@chakra-ui/react";
 import { Link } from 'react-router-dom';
 import { FaUserAlt, FaLock } from "react-icons/fa";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { Navigate,useNavigate } from 'react-router-dom';
+
+
 
 const CFaUserAlt = chakra(FaUserAlt);
 const CFaLock = chakra(FaLock);
 
+
 const Login = () => {
+  const[email,setEmail]=useState('');
+  const[password,setPassword]=useState('')
+  const auth = getAuth();
+  const navigate=useNavigate();
+
+  const handleLogin =(e)=>{
+    e.preventDefault();
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      console.log("Singed in user: ", user);
+      navigate('/home')
+      
+      
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log("An error occured: ", errorCode, errorMessage);
+    });
+
+  }
+
 
   return (
     <Flex
@@ -53,7 +81,12 @@ const Login = () => {
                     pointerEvents="none"
                     children={<CFaUserAlt color="gray.400" />}
                   />
-                  <Input type="email" placeholder="Email Address" />
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e)=>setEmail(e.target.value)}
+                    placeholder="Email Address"
+                    required />
                 </InputGroup>
               </FormControl>
               <FormControl>
@@ -65,21 +98,25 @@ const Login = () => {
                   />
                   <Input
                     type={"password"}
+                    value={password}
+                    onChange={(e)=>setPassword(e.target.value)}
                     placeholder="Password"
+                    required
                   />
                 </InputGroup>
               </FormControl>
-              <Link to='/dashboard'>
+             
                 <Button
                   borderRadius={0}
                   type="submit"
                   variant="solid"
                   colorScheme="blue"
                   width="full"
+                  onClick={handleLogin}
                 >
                   Login
                 </Button>
-              </Link>
+              
             </Stack>
           </form>
         </Box>

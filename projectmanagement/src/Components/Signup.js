@@ -18,11 +18,59 @@ import React from 'react'
 import { FaLock } from "react-icons/fa";
 import { BiHide, BiShow } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+    collection,
+    getDocs,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    doc,
+  } from "firebase/firestore";
+  import {db} from '../configs/firebaseConfigs'
+
+  
 const CFaLock = chakra(FaLock);
 
+
 const Signup = () => {
+    const auth = getAuth();
 
     const [showPassword, setShowPassword] = useState(false);
+    const [firstName,setFirstName] =useState('')
+    const[lastName,setLastName]=useState('')
+    const[email,setEmail]=useState('')
+    const[password,setPassword]=useState('')
+    const[confirmPw,setConfirmPw]=useState('')
+
+    const [users, setUsers] = useState([]);
+    const usersCollectionRef = collection(db, "users");
+
+    const handleRegister =(e)=>{
+        e.preventDefault();
+        console.log('first')
+        createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log("Registered user: ", user);
+        setEmail("");
+        setPassword("");
+      })
+      .then(()=>{
+         addDoc(usersCollectionRef, { 
+            first_Name: firstName, 
+            last_Name: lastName,
+            email:email });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log("Error ocured: ", errorCode, errorMessage);
+      });
+
+    }
+
+
     const navigate = useNavigate();
 
     return (
@@ -53,16 +101,26 @@ const Signup = () => {
                             <HStack>
                                 <FormControl isRequired>
                                     <FormLabel htmlFor='first-name'>First name</FormLabel>
-                                    <Input id='first-name' />
+                                    <Input id='first-name'
+                                        value={firstName}
+                                        onChange={(e)=>setFirstName(e.target.value)}
+                                    />
                                 </FormControl>
                                 <FormControl isRequired >
                                     <FormLabel htmlFor='last-name'>Last name</FormLabel>
-                                    <Input id='last-name' />
+                                    <Input id='last-name'
+                                        value={lastName}
+                                        onChange={(e)=>setLastName(e.target.value)}
+                                    />
                                 </FormControl>
                             </HStack>
                             <FormControl isRequired>
                                 <FormLabel htmlFor='email'>Email</FormLabel>
-                                <Input id='email' />
+                                <Input id='email'
+                                    value={email}
+                                    onChange={(e)=>setEmail(e.target.value)}
+                                
+                                />
                             </FormControl>
                             <FormControl isRequired>
                                 <FormLabel htmlFor='password'>Password</FormLabel>
@@ -72,7 +130,12 @@ const Signup = () => {
                                         color="gray.300"
                                         children={<CFaLock color="gray.400" />}
                                     />
-                                    <Input id='password' type={showPassword ? "text" : "password"} />
+                                    <Input
+                                        id='password'
+                                        type={showPassword ? "text" : "password"}
+                                        value={password}
+                                        onChange={(e)=>setPassword(e.target.value)} 
+                                    />
                                     <InputRightElement >
                                         <Button
                                             h="2rem" size="sm"
@@ -93,7 +156,12 @@ const Signup = () => {
                                         color="gray.300"
                                         children={<CFaLock color="gray.400" />}
                                     />
-                                    <Input id='cPassword' type={"password"} />
+                                    <Input
+                                        id='cPassword'
+                                        type={"password"}
+                                        value={confirmPw}
+                                        onChange={(e)=>setConfirmPw(e.target.value)}  
+                                    />
                                 </InputGroup>
                             </FormControl>
                             <Button
@@ -102,6 +170,7 @@ const Signup = () => {
                                 variant="solid"
                                 colorScheme="blue"
                                 width="full"
+                                onClick={handleRegister}
                             >
                                 Sign Up
                             </Button>

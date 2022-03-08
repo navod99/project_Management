@@ -3,9 +3,11 @@ import React from 'react'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import { ImMenu } from 'react-icons/im'
 import { Link } from "react-router-dom"
+import { getAuth,signOut } from "firebase/auth"
 
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const auth = getAuth();
 
   return (
     <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -50,6 +52,23 @@ const Navbar = () => {
                 bg='teal.500'
               />
             </MenuButton>
+           
+            <Link
+              to="/"
+              onClick={() => {
+                signOut(auth)
+                  .then(() => {
+                    console.log("user signed out");
+                  })
+                  .catch((error) => {
+                    console.log("error", error);
+                  });
+              }}
+            >
+              Log out
+            </Link>
+
+           
           </Menu>
         </Flex>
       </Flex>
